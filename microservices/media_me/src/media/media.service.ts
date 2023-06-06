@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMediaDto } from './dto/create-media.dto';
-import { UpdateMediaDto } from './dto/update-media.dto';
 import { MediaDocument } from './schemas/media.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';

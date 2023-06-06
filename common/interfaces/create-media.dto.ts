@@ -8,8 +8,8 @@ import {
   IsArray,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { PlatformMedia } from '../enums/platform.enum';
-import { MediaType } from '../enums/media_type.enum';
+import { PlatformMedia } from 'src/media/enums/platform.enum';
+import { MediaType } from 'src/media/enums/media_type.enum';
 
 export class CreateMediaDto {
 

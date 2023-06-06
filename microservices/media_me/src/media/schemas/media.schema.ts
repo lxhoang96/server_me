@@ -1,10 +1,10 @@
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, SchemaTypes, Types } from 'mongoose';
-import { MediaType } from '../enums/media_type.enum';
-import { PlatformMedia } from '../enums/platform.enum';
+import { MediaType } from '../../../../../api_gateway/src/media/enums/media_type.enum';
+import { PlatformMedia } from '../../../../../api_gateway/src/media/enums/platform.enum';
 import { UploaderDocument } from 'src/uploader/schemas/uploader.schema';
-import { ShareType } from '../enums/share_type.enum';
+import { ShareType } from '../../../../../api_gateway/src/media/enums/share_type.enum';
 
 
 @Schema({
