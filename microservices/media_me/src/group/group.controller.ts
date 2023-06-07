@@ -1,23 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { GroupService } from './group.service';
-import { CreateGroupDto } from './dto/create-group.dto';
+import { CreateGroupInterface } from '../../../../common/interfaces/create-group.interface';
+import { MessagePattern } from '@nestjs/microservices';
 
-@Controller('group')
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
-  @Post()
-  create(@Body() createGroupDto: CreateGroupDto) {
-    return this.groupService.create(createGroupDto);
+  @MessagePattern({ cmd: 'createGroup' })
+  create( body: CreateGroupInterface) {
+    return this.groupService.create(body);
   }
 
-  @Get()
+  @MessagePattern({ cmd: 'findGroups' })
   findAll() {
     return this.groupService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @MessagePattern({ cmd: 'findGroup' })
+  findOne(id: string) {
     return this.groupService.findOne(id);
   }
 

@@ -1,38 +1,38 @@
-import { Controller, Post, Body, UseInterceptors, UploadedFile, HttpStatus, ParseFilePipeBuilder, UploadedFiles } from '@nestjs/common';
+import { Controller, UseInterceptors, UploadedFile, UploadedFiles } from '@nestjs/common';
 import { MediaService } from './media.service';
 import { AnyFilesInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from './interceptors/config.intercepter';
-import { CreateMediaDto } from './dto/create-media.dto';
-// import { FileSizeValidationPipe } from './validations/file_size.validation';
+import { CreateMediaInterface } from '../../../../common/interfaces/create-media.interface';
+import { MessagePattern } from '@nestjs/microservices';
 
 @Controller('media')
 
 export class MediaController {
   constructor(private readonly mediaService: MediaService) { }
 
-  @Post('uploadImage')
+  @MessagePattern({ cmd: 'uploadImage' })
   @UseInterceptors(FileInterceptor('file', multerOptions))
   uploadSingleImage(
-    @Body() body: CreateMediaDto,
+     body: CreateMediaInterface,
     @UploadedFile() file: Express.Multer.File,
   ) {
     return this.mediaService.create(body, [file.path]);
   }
 
-  @Post('uploadListImage')
+  @MessagePattern({ cmd: 'uploadListImage' })
   @UseInterceptors(FilesInterceptor('files', 100, multerOptions))
   uploadListImage(
-    @Body() body: CreateMediaDto,
+  body: CreateMediaInterface,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
     const paths = files.map(a => a.path);
     return this.mediaService.create(body, paths);
   }
 
-  @Post('uploadMultiImages')
+  @MessagePattern({ cmd: 'uploadMultiImages' })
   @UseInterceptors(AnyFilesInterceptor(multerOptions))
   uploadMultiImages(
-    @Body() body: CreateMediaDto,
+    body: CreateMediaInterface,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
     const paths = files.map(a => a.path);

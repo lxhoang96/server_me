@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateGroupDto } from './dto/create-group.dto';
 import { GroupDocument } from './schemas/group.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UploaderDocument } from 'src/uploader/schemas/uploader.schema';
+import { CreateGroupInterface } from '../../../../common/interfaces/create-group.interface';
+
 var mongoose = require('mongoose');
 @Injectable()
 export class GroupService {
@@ -11,8 +12,8 @@ export class GroupService {
     @InjectModel(GroupDocument.name)
     private groupDocument: Model<GroupDocument>,
   ) { }
-  create(createGroupDto: CreateGroupDto) {
-    const newGroup = new this.groupDocument(createGroupDto);
+  create(createGroupInterface: CreateGroupInterface) {
+    const newGroup = new this.groupDocument(createGroupInterface);
     return newGroup.save();
   }
 

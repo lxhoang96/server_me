@@ -1,28 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { AlbumService } from './album.service';
-import { CreateAlbumDto } from './dto/create-album.dto';
-
-@Controller('album')
+import { CreateAlbumInterface } from '../../../../common/interfaces/create-album.interface';
+import { MessagePattern } from '@nestjs/microservices';
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
 
-  @Post()
-  create(@Body() createAlbumDto: CreateAlbumDto) {
-    return this.albumService.create(createAlbumDto);
+  @MessagePattern({ cmd: 'createAlbum' })
+  create( createAlbumInterface: CreateAlbumInterface) {
+    return this.albumService.create(createAlbumInterface);
   }
 
-  @Get()
+  @MessagePattern({ cmd: 'getAlbums' })
   findAll() {
     return this.albumService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @MessagePattern({ cmd: 'getAlbum' })
+  findOne( id: string) {
     return this.albumService.findOne(id);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @MessagePattern({ cmd: 'deleteAlbum' })
+  remove( id: string) {
     return this.albumService.remove(id);
   }
 }

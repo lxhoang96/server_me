@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUploaderDto } from './dto/create-uploader.dto';
-import { UpdateUploaderDto } from './dto/update-uploader.dto';
 import { UploaderDocument } from './schemas/uploader.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { CreateUploaderInterface } from '../../../../common/interfaces/create-uploader.interface';
 
 @Injectable()
 export class UploaderService {
@@ -11,8 +10,8 @@ export class UploaderService {
     @InjectModel(UploaderDocument.name)
     private uploader: Model<UploaderDocument>,) { }
   
-  async create(createUploaderDto: CreateUploaderDto) {
-    const new_uploader = new this.uploader(createUploaderDto);
+  async create(createUploaderInterface: CreateUploaderInterface) {
+    const new_uploader = new this.uploader(createUploaderInterface);
     await new_uploader.save();
   }
 
@@ -24,9 +23,6 @@ export class UploaderService {
     return await this.uploader.findById(id);
   }
 
-  update(id: number, updateUploaderDto: UpdateUploaderDto) {
-    return `This action updates a #${id} uploader`;
-  }
 
   remove(id: number) {
     return `This action removes a #${id} uploader`;

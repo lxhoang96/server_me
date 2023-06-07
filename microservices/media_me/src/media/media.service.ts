@@ -3,6 +3,7 @@ import { MediaDocument } from './schemas/media.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UploaderService } from 'src/uploader/uploader.service';
+import { CreateMediaInterface } from '../../../../common/interfaces/create-media.interface';
 
 @Injectable()
 export class MediaService {
@@ -11,13 +12,13 @@ export class MediaService {
     private mediaDocument: Model<MediaDocument>,
     private uploaderService: UploaderService,
   ) { }
-  async create(createMediaDto: CreateMediaDto, paths: string[]) {
+  async create(createMediaInterface: CreateMediaInterface, paths: string[]) {
     try {
-      let docs = new this.mediaDocument(createMediaDto);
+      let docs = new this.mediaDocument(createMediaInterface);
       docs.paths = paths;
     
       const savedDoc = await docs.save();
-      let uploader = await this.uploaderService.findOne(createMediaDto.uploader);
+      let uploader = await this.uploaderService.findOne(createMediaInterface.uploader);
       uploader.medias.push(savedDoc._id);
       await uploader.save();
       return true;

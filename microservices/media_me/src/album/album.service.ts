@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateAlbumDto } from './dto/create-album.dto';
 import { AlbumDocument } from './schemas/album.schema';
-import { CreateMediaDto } from 'src/media/dto/create-media.dto';
-import { MediaService } from 'src/media/media.service';
 import { MediaDocument } from 'src/media/schemas/media.schema';
+import { CreateAlbumInterface } from '../../../../common/interfaces/create-album.interface';
 
 @Injectable()
 export class AlbumService {
@@ -13,8 +11,9 @@ export class AlbumService {
     @InjectModel(AlbumDocument.name)
     private albumDocument: Model<AlbumDocument>,
   ) { }
-  create(createAlbumDto: CreateAlbumDto) {
-    const newAlbum = new this.albumDocument(createAlbumDto);
+  
+  create(createAlbumInterface: CreateAlbumInterface) {
+    const newAlbum = new this.albumDocument(createAlbumInterface);
     return newAlbum.save();
   }
 
