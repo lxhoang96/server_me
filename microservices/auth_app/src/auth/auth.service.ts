@@ -23,7 +23,7 @@ export class AuthService {
     console.log(this.usersService)
   }
 
-  async validateUser(signinDTO: SigninInterface): Promise<any> {
+  async signIn(signinDTO: SigninInterface): Promise<any> {
     console.log(signinDTO);
 
     const user = await this.usersService.findOne(signinDTO.type, signinDTO.username);
@@ -34,7 +34,7 @@ export class AuthService {
     if (user.password !== signinDTO.password) {
       throw new UnauthorizedException();
     }
-    await this.sessionService.endUserSession(user.id);
+    await this.sessionService.endAllUserSession(user.id);
     signinDTO.sessionDTO.userID = user.id;
     let newSession = await this.sessionService.createSession(signinDTO.sessionDTO);
     const encryptedSession = this.usersService.encryptPublic(user.publicKey, newSession.id);
@@ -43,13 +43,6 @@ export class AuthService {
     // TODO: Generate a JWT and return it here
     // instead of the user object
     return { id: user.id, session: encryptedSession };
-  }
-
-  async signIn(signinDTO: SigninInterface) {
-    // console.log(signinDTO);
-    return await this.validateUser(signinDTO);
-    // const response = new ResponseDefault(ResponseCode.Success, result);
-    // return response.toJson();
   }
 
   async register(newUser: CreateUserInterface): Promise<any> {
@@ -123,5 +116,17 @@ export class AuthService {
       }
     }
     return true;
+  }
+
+  async validateToken(token: string) {
+    const session = await this.sessionService.findByValue(token);
+    if (!session || session.isExpired) {
+      throw new UnauthorizedException();
+    }
+    const user = await this.usersService.findOneById(session.userID.toHexString());
+    if (!user) {
+      return new UnauthorizedException();
+    }
+    return user._id;
   }
 }

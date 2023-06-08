@@ -5,6 +5,8 @@ import { AppService } from "./app.service";
 import { AUTH_SERVICE, MEDIA_SERVICE } from "../../common/services.name";
 import { AuthModule } from './auth/auth.module';
 import { MediaModule } from './media/media.module';
+import { APP_GUARD } from "@nestjs/core";
+import { AuthGuard } from "./auth/auth.guard";
 
 @Module({
   imports: [
@@ -19,14 +21,14 @@ import { MediaModule } from './media/media.module';
         },
         
       },
-      // {
-      //   name: MEDIA_SERVICE,
-      //   transport: Transport.TCP,
-      //   options: {
-      //     host: "127.0.0.1",
-      //     port: 3000
-      //   }
-      // },
+      {
+        name: MEDIA_SERVICE,
+        transport: Transport.TCP,
+        options: {
+          host: "127.0.0.1",
+          port: 3000
+        }
+      },
     ],
       isGlobal: true
     }),
@@ -34,6 +36,11 @@ import { MediaModule } from './media/media.module';
     MediaModule
   ],
   controllers: [AppController],
-  providers: [AppService]
+  providers: [AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ]
 })
 export class AppModule { }

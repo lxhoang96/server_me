@@ -1,6 +1,7 @@
 import { GroupService } from './group.service';
 import { CreateGroupInterface } from '../../../../common/interfaces/create-group.interface';
 import { MessagePattern } from '@nestjs/microservices';
+import { Controller } from '@nestjs/common';
 
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}

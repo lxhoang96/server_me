@@ -1,6 +1,8 @@
 import { AlbumService } from './album.service';
 import { CreateAlbumInterface } from '../../../../common/interfaces/create-album.interface';
 import { MessagePattern } from '@nestjs/microservices';
+import { Controller } from '@nestjs/common';
+
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
 

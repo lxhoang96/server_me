@@ -19,13 +19,13 @@ export class UploaderDocument extends Document {
   @Prop({ type: [SchemaTypes.ObjectId], ref: 'User' })
   friends: [];
 
-  @Prop({ type: [SchemaTypes.ObjectId], ref: GroupDocument.name })
+  @Prop({ type: [SchemaTypes.ObjectId], ref: 'GroupDocument' })
   groups: GroupDocument[];
 
-  @Prop({ type: [SchemaTypes.ObjectId], ref: AlbumDocument.name })
+  @Prop({ type: [SchemaTypes.ObjectId], ref: 'AlbumDocument' })
   albums: AlbumDocument[];
 
-  @Prop({ type: [SchemaTypes.ObjectId], ref: MediaDocument.name })
+  @Prop({ type: [SchemaTypes.ObjectId], ref: 'MediaDocument' })
   medias: MediaDocument[];
 }
 

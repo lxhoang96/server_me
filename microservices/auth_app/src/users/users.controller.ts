@@ -3,6 +3,7 @@ import { UsersService } from './users.service';
 import { SessionService } from 'src/session/session.service';
 import { MessagePattern, EventPattern } from '@nestjs/microservices';
 
+@Controller()
 export class UsersController {
   constructor(
     private userService: UsersService,
@@ -15,7 +16,7 @@ export class UsersController {
   //   name: 'session',
     
   // })
-  @EventPattern({ cmd: 'me' })
+  @MessagePattern({ cmd: 'me' })
   async getProfile(req) {
     console.log(req.session);
     const session = await this.sessionService.findByValue(req.session);

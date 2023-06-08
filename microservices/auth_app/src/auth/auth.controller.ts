@@ -1,9 +1,11 @@
-import {  Inject } from '@nestjs/common';
+import {  Controller, Inject } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { MessagePattern, } from '@nestjs/microservices';
 import { CreateUserInterface } from '../../../../common/interfaces/create-user.interface';
 import { SigninInterface } from '../../../../common/interfaces/signin.interface';
 import { of } from 'rxjs';
+
+@Controller()
 export class AuthController {
 
   constructor(
@@ -26,6 +28,13 @@ export class AuthController {
   @MessagePattern({ cmd: 'autoLogin' })
   async autoLogin( req) {
     const id = await this.authService.autoLogin(req.id, req.session, req.sessionDto);
+    console.log(id);
+    return id;
+  }
+
+  @MessagePattern({ cmd: 'validateUser' })
+  async validateUser(token: string) {
+    const id = await this.authService.validateToken(token);
     console.log(id);
     return id;
   }

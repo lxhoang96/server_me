@@ -36,6 +36,9 @@ export class User extends Document {
   @Prop()
   nickname: string;
 
+  @Prop({default: true})
+  isActive: boolean;
+
   @Prop()
   privateKey: string;
 

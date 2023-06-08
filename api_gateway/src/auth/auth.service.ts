@@ -4,7 +4,6 @@ import { map, timeout } from 'rxjs/operators';
 import { SigninDTO } from 'src/dto/signin.dto';
 import { CreateUserDto } from 'src/dto/create-user.dto';
 import { AUTH_SERVICE } from '../../../common/services.name';
-import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class AuthGatewayService {
@@ -23,7 +22,7 @@ export class AuthGatewayService {
   }
 
   register(createUserDTO: CreateUserDto) {
-    const pattern = { cmd: "register" };
+    const pattern = { cmd: "register" }; 
     return this.authService
       .send<string>(pattern, createUserDTO)
       .pipe(
@@ -35,6 +34,15 @@ export class AuthGatewayService {
     const pattern = { cmd: "autoLogin" };
     return this.authService
       .send<string>(pattern, req)
+      .pipe(
+        map((message: any) => (message))
+      );
+  }
+
+  validateUser(token: string) {
+    const pattern = { cmd: "validateUser" };
+    return this.authService
+      .send<string>(pattern, token)
       .pipe(
         map((message: any) => (message))
       );

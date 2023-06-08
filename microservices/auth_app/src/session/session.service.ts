@@ -14,7 +14,7 @@ export class SessionService {
     return this.session.findOne({ value: valueCheck }).exec();
   }
 
-  async endUserSession(userId: string): Promise<boolean> {
+  async endAllUserSession(userId: string): Promise<boolean> {
     const currentSessiones = await this.session.find({ userID: userId, isExpired: false }).exec();
     if (!currentSessiones) return false;
     for (let currentSession of currentSessiones) {

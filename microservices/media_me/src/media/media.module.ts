@@ -3,18 +3,18 @@ import { MediaService } from './media.service';
 import { MediaController } from './media.controller';
 import { MulterModule } from '@nestjs/platform-express';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
+import { MediaDocument, MediaDocumentSchema } from './schemas/media.schema';
+import { UploaderModule } from 'src/uploader/uploader.module';
 
 @Module({
   imports: [
-    MulterModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        dest: configService.get<string>('MULTER_DEST'),
-      }),
-      inject: [ConfigService],
-    }),
+    
+    MongooseModule.forFeature([{ name: MediaDocument.name, schema: MediaDocumentSchema, collection: 'media', }]),
+    UploaderModule,
   ],
   controllers: [MediaController],
   providers: [MediaService]
 })
+  
 export class MediaModule {}

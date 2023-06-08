@@ -1,34 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { UploaderService } from './uploader.service';
-import { CreateUploaderDto } from './dto/create-uploader.dto';
-import { UpdateUploaderDto } from './dto/update-uploader.dto';
+import { CreateUploaderInterface } from '../../../../common/interfaces/create-uploader.interface';
+import { MessagePattern } from '@nestjs/microservices';
+import { Controller } from '@nestjs/common';
 
-@Controller('uploader')
 export class UploaderController {
   constructor(private readonly uploaderService: UploaderService) {}
 
-  @Post()
-  create(@Body() createUploaderDto: CreateUploaderDto) {
-    return this.uploaderService.create(createUploaderDto);
+  @MessagePattern({ cmd: 'createUploader' })
+  create(createUploaderInterface: CreateUploaderInterface) {
+    return this.uploaderService.create(createUploaderInterface);
   }
 
-  @Get()
+  @MessagePattern({ cmd: 'findAllUploader' })
   findAll() {
     return this.uploaderService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.uploaderService.findOne(+id);
+  @MessagePattern({ cmd: 'findUploader' })
+  findOne( id: string) {
+    return this.uploaderService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUploaderDto: UpdateUploaderDto) {
-    return this.uploaderService.update(+id, updateUploaderDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @MessagePattern({ cmd: 'removeUploader' })
+  remove( id: string) {
     return this.uploaderService.remove(+id);
   }
 }
