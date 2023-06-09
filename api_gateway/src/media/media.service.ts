@@ -13,9 +13,13 @@ export class MediaService {
 
   ) { }
   create(newMedia: CreateMediaDto, paths: string[]) {
+    const uploaderPattern = { cmd: "createUploader" };
+    this.mediaService
+      .send<any>(uploaderPattern, newMedia.uploader)
+      .subscribe(value => newMedia.uploader = value);
     const pattern = { cmd: "uploadImage" };
     const result = this.mediaService
-      .send<any>(pattern, {newMedia, paths})
+      .send<any>(pattern, { newMedia, paths })
       .pipe(timeout(3000));
     // result.forEach(value => console.log(value));
     return result;

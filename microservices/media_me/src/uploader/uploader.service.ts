@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { UploaderDocument } from './schemas/uploader.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateUploaderInterface } from '../../../../common/interfaces/create-uploader.interface';
 
 @Injectable()
 export class UploaderService {
@@ -10,8 +9,12 @@ export class UploaderService {
     @InjectModel(UploaderDocument.name)
     private uploader: Model<UploaderDocument>,) { }
   
-  async create(createUploaderInterface: CreateUploaderInterface) {
-    const new_uploader = new this.uploader(createUploaderInterface);
+  async create(userID: string) {
+    const current_uploader = await this.uploader.findOne({ userID: userID }).exec();
+    if (current_uploader) {
+      return current_uploader;
+    }
+    const new_uploader = new this.uploader({ userID : userID});
     await new_uploader.save();
   }
 

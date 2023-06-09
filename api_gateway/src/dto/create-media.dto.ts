@@ -17,7 +17,6 @@ export class CreateMediaDto {
   @ApiProperty({ enum: PlatformMedia, default: PlatformMedia.Other })
   platform: string;
 
-  @IsNotEmpty()
   @ApiProperty()
   uploader: string;
 
