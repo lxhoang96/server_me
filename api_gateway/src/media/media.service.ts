@@ -1,9 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AUTH_SERVICE, MEDIA_SERVICE } from '../../../common/services.name';
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateMediaDto } from 'src/dto/create-media.dto';
-import { timeout } from 'rxjs';
-
+import { catchError, firstValueFrom, timeout } from 'rxjs';
 @Injectable()
 export class MediaService {
 
@@ -12,16 +11,26 @@ export class MediaService {
     private readonly mediaService: ClientProxy
 
   ) { }
-  create(newMedia: CreateMediaDto, paths: string[]) {
+  async create(newMedia: any, userID: string, paths: string[]) {
     const uploaderPattern = { cmd: "createUploader" };
-    this.mediaService
-      .send<any>(uploaderPattern, newMedia.uploader)
-      .subscribe(value => newMedia.uploader = value);
+    const newUploader = await firstValueFrom(this.mediaService
+      .send<string>(uploaderPattern, { userID })
+      .pipe(
+        timeout(5000),
+        catchError(err => {
+          throw err;
+        }),));
+    // newMedia = uploader;
+    if (newUploader) {
+      newMedia['uploader'] = newUploader;
+    } else {
+      throw new HttpException("Can not create new uploader", HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+    console.log(newMedia)
     const pattern = { cmd: "uploadImage" };
     const result = this.mediaService
       .send<any>(pattern, { newMedia, paths })
       .pipe(timeout(3000));
-    // result.forEach(value => console.log(value));
     return result;
   }
 }

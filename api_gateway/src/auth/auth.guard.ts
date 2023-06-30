@@ -16,8 +16,8 @@ export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly authService: AuthGatewayService,
-    private reflector: Reflector) { 
-    }
+    private reflector: Reflector) {
+  }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
@@ -35,12 +35,14 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      this.authService.validateUser(sessionValue).pipe(map(session => {
-        if (session.isExpired) {
-          throw new UnauthorizedException();
-        }
-      }))
-    } catch {
+      const result = await this.authService.validateUser(sessionValue, request.body);
+      if (result) {
+        request.headers['id'] = result.id;
+        request.body = result.body;
+      } else {
+        throw new UnauthorizedException();
+      }
+    } catch (e) {
       throw new UnauthorizedException();
     }
     return true;

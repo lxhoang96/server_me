@@ -13,6 +13,7 @@ export class MediaService {
     private uploaderService: UploaderService,
   ) { }
   async create(createMediaInterface: CreateMediaInterface, paths: string[]) {
+    console.log(createMediaInterface.uploader)
     try {
       let docs = new this.mediaDocument(createMediaInterface);
       docs.paths = paths;

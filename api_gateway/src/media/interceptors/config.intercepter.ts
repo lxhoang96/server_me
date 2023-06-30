@@ -3,6 +3,7 @@ import { existsSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
 import { v4 as uuid } from 'uuid';
 import { HttpException, HttpStatus } from '@nestjs/common';
+require('dotenv').config(); 
 const os = require('os');
 // Multer configuration
 const multerConfig = {
@@ -29,13 +30,13 @@ export const multerOptions = {
   storage: diskStorage({
     // Destination storage path details
     destination: (req: any, file: any, cb: any) => {
-      const userID = req.body.uploadID;
+      const userID = req.headers.id;
       const dateNow = new Date();
       const uploadPath = multerConfig.dest + `/${userID}` + `/${dateNow.getFullYear()}`
         + `/${dateNow.getMonth()}` + `/${dateNow.getDate()}` + `/${file.mimetype}`;
       // Create folder if doesn't exist
       if (!existsSync(uploadPath)) {
-        mkdirSync(uploadPath);
+        mkdirSync(uploadPath, { recursive: true });
       }
       cb(null, uploadPath);
     },

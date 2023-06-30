@@ -1,13 +1,18 @@
 import { UploaderService } from './uploader.service';
 import { MessagePattern } from '@nestjs/microservices';
-import { Controller } from '@nestjs/common';
+import { Controller, Inject } from '@nestjs/common';
 
+@Controller()
 export class UploaderController {
-  constructor(private readonly uploaderService: UploaderService) {}
+  constructor(
+    private readonly uploaderService: UploaderService) {
+    // console.log(this.uploaderService)
+  }
 
   @MessagePattern({ cmd: 'createUploader' })
-  create(userID: string) {
-    return this.uploaderService.create(userID);
+  create(req: any) {
+    console.log(req)
+    return this.uploaderService.create(req.userID);
   }
 
   @MessagePattern({ cmd: 'findAllUploader' })

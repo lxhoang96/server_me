@@ -1,21 +1,19 @@
 // import { Controller, UseInterceptors, UploadedFile, UploadedFiles } from '@nestjs/common';
 import { MediaService } from './media.service';
-import { CreateMediaInterface } from '../../../../common/interfaces/create-media.interface';
 import { MessagePattern } from '@nestjs/microservices';
-import { Controller } from '@nestjs/common';
+import { Controller, Inject } from '@nestjs/common';
 
+@Controller()
 export class MediaController {
-  constructor(private readonly mediaService: MediaService) { }
-
+  constructor(
+    private readonly mediaService: MediaService) { }
 
   @MessagePattern({ cmd: 'uploadImage' })
-  uploadListImage(
-    body: CreateMediaInterface,
-    files: Array<Express.Multer.File>,
+  uploadImage(
+    req: any
   ) {
-    const paths = files.map(a => a.path);
-    return this.mediaService.create(body, paths);
+    console.log(req);
+    const paths = req.paths.map(a => a.path);
+    return this.mediaService.create(req.newMedia, paths);
   }
-
-
 }

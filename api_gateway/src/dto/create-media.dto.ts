@@ -17,11 +17,32 @@ export class CreateMediaDto {
   @ApiProperty({ enum: PlatformMedia, default: PlatformMedia.Other })
   platform: string;
 
-  @ApiProperty()
-  uploader: string;
 
   @ApiProperty({enum: MediaType, default: MediaType.Image})
   @IsNotEmpty()
   type: string;
 
+  @ApiProperty({ type: 'string', format: 'binary', required: true })
+  file: Express.Multer.File
+
+}
+
+export class CreateMediasDto {
+
+  @IsNotEmpty()
+  @ApiProperty({ enum: PlatformMedia, default: PlatformMedia.Other })
+  platform: string;
+
+
+  @ApiProperty({ enum: MediaType, default: MediaType.Image })
+  @IsNotEmpty()
+  type: string;
+
+  @ApiProperty({
+    type: 'array', items: {
+      type: 'string',
+      format: 'binary',
+    }, required: true
+  })
+  files: Array<Express.Multer.File>
 }

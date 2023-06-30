@@ -7,9 +7,7 @@ import { of } from 'rxjs';
 
 @Controller()
 export class AuthController {
-
   constructor(
-    @Inject(AuthService)
     private readonly authService: AuthService)
   { }
  
@@ -21,21 +19,20 @@ export class AuthController {
   }
 
   @MessagePattern({ cmd: 'register' })
-  async register( createUserDTO: CreateUserInterface) {
+  async register(createUserDTO: CreateUserInterface) {
     return this.authService.register(createUserDTO);
   }
 
   @MessagePattern({ cmd: 'autoLogin' })
-  async autoLogin( req) {
-    const id = await this.authService.autoLogin(req.id, req.session, req.sessionDto);
-    console.log(id);
-    return id;
+  async autoLogin(req: any) {
+    const session = await this.authService.autoLogin(req.session, req.sessionDto);
+    return session;
   }
 
-  @MessagePattern({ cmd: 'validateUser' })
-  async validateUser(token: string) {
-    const id = await this.authService.validateToken(token);
-    console.log(id);
-    return id;
+  @MessagePattern({ cmd: 'validateToken' })
+  async validateToken(req: any) {
+    const result = await this.authService.validateToken(req.token, req.body);
+    return result;
   }
+
 }

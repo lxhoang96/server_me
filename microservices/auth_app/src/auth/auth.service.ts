@@ -7,32 +7,29 @@ import { ResponseCode } from 'common/response.code';
 import { CreateUserInterface } from '../../../../common/interfaces/create-user.interface';
 import { SigninInterface } from '../../../../common/interfaces/signin.interface';
 import { SessionInterface } from '../../../../common/interfaces/session.interface';
+import { RpcException } from '@nestjs/microservices';
 
-// const {
-//   publicEncrypt,
-//   privateDecrypt,
-// } = require('crypto');
+const {
+  privateDecrypt,
+} = require('crypto');
 @Injectable()
 export class AuthService {
+
   constructor(
     private readonly sessionService: SessionService,
     private readonly usersService: UsersService,
-  ) { 
-    console.log('auth service alive!')
-    console.log(this.sessionService)
-    console.log(this.usersService)
-  }
+  ) { }
 
   async signIn(signinDTO: SigninInterface): Promise<any> {
-    console.log(signinDTO);
 
     const user = await this.usersService.findOne(signinDTO.type, signinDTO.username);
     if (!user) {
-      throw new UnauthorizedException();
+      throw new RpcException('Invalid credentials.');
+
     }
-    console.log(user);
     if (user.password !== signinDTO.password) {
-      throw new UnauthorizedException();
+      throw new RpcException('Invalid credentials.');
+
     }
     await this.sessionService.endAllUserSession(user.id);
     signinDTO.sessionDTO.userID = user.id;
@@ -42,7 +39,7 @@ export class AuthService {
     newSession.save();
     // TODO: Generate a JWT and return it here
     // instead of the user object
-    return { id: user.id, session: encryptedSession };
+    return { session: encryptedSession, publicKey: user.publicKey };
   }
 
   async register(newUser: CreateUserInterface): Promise<any> {
@@ -71,28 +68,29 @@ export class AuthService {
     // return response.toJson();
   }
 
-  async signOut(id: string, session: string) {
+  async signOut(id: string, session: string): Promise<boolean> {
     const user = await this.usersService.findOneById(id);
-    const currentSession = await this.usersService.decryptPrivate(user.privateKey, session);
+    const currentSession = await this.decryptPrivate(user.privateKey, session);
     return await this.sessionService.endSession(currentSession._id);
     // const response = new ResponseDefault(ResponseCode.Success, isCurrentSession);
     // return response.toJson();
   }
 
-  async autoLogin(id: string, value: string, sessionDto: SessionInterface) {
+  async autoLogin(value: string, sessionDto: SessionInterface): Promise<string> {
     const session = await this.sessionService.findByValue(value);
     if (!session || session.isExpired || !this.isSubObject(JSON.stringify(session), JSON.stringify(sessionDto))) {
-      throw new UnauthorizedException();
+      throw new RpcException('Invalid credentials.');
     }
-    const user = await this.usersService.findOneById(id);
+    const user = await this.usersService.findOneById(session.userID.toHexString());
     if (!user) {
-      throw new UnauthorizedException();
+      throw new RpcException('Invalid credentials.');
+
     }
 
-    if (!session.userID.equals(user._id)) {
-      console.log('3');
-      throw new UnauthorizedException();
-    }
+    // if (!session.userID.equals(user._id)) {
+    //   throw new RpcException('Invalid credentials.');
+
+    // }
     session.reLoginAt = new Date();
     session.expiredAt = new Date(session.reLoginAt.getTime() + parseInt(process.env.SESSION_TIMEOUT));
     delete session.value;
@@ -107,26 +105,34 @@ export class AuthService {
     for (var key in object2) {
       // stop if the key exists in the subobject but not in the main object
       if (object2.hasOwnProperty(key) && !object1.hasOwnProperty(key)) {
-        console.log('1.1');
         return false;
       }
       if (object2.key != object1.key) {
-        console.log('1.2');
         return false;
       }
     }
     return true;
   }
 
-  async validateToken(token: string) {
+  async validateToken(token: string, body: any): Promise<{id: string, body: any}> {
     const session = await this.sessionService.findByValue(token);
+
     if (!session || session.isExpired) {
-      throw new UnauthorizedException();
+      throw new RpcException('Invalid credentials.');
+
     }
     const user = await this.usersService.findOneById(session.userID.toHexString());
     if (!user) {
-      return new UnauthorizedException();
+      throw new RpcException('Invalid credentials.');
+
     }
-    return user._id;
+    const bodyDecrypted = await this.decryptPrivate(user.privateKey, body);
+    
+    return { id: user._id, body: bodyDecrypted };
+  }
+
+  async decryptPrivate(key: string, value: string): Promise<any> {
+    return await privateDecrypt(key, Buffer.from(value));
   }
 }
+

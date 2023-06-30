@@ -9,13 +9,14 @@ export class UploaderService {
     @InjectModel(UploaderDocument.name)
     private uploader: Model<UploaderDocument>,) { }
   
-  async create(userID: string) {
+  async create(userID: string): Promise<string> {
     const current_uploader = await this.uploader.findOne({ userID: userID }).exec();
     if (current_uploader) {
-      return current_uploader;
+      return current_uploader._id;
     }
     const new_uploader = new this.uploader({ userID : userID});
     await new_uploader.save();
+    return new_uploader._id;
   }
 
   async findAll() {

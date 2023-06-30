@@ -25,7 +25,6 @@ import { MEDIA_SERVICE } from '../../../common/services.name';
           }
         },
       ],
-      isGlobal: true
     }),
   ],
   controllers: [MediaController],

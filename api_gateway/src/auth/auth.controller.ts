@@ -4,6 +4,7 @@ import { ApiQuery, ApiTags, ApiHeader, ApiBody } from '@nestjs/swagger';
 import { SigninDTO } from 'src/dto/signin.dto';
 import { CreateUserDto } from 'src/dto/create-user.dto';
 import { Public } from './auth.guard';
+import { SessionDto } from 'src/dto/session.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -14,15 +15,12 @@ export class AuthController {
   @ApiBody({
     type: SigninDTO,
   })
-  signIn(@Body()  signinDTO: SigninDTO) {
+  signIn(@Body() signinDTO: SigninDTO) {
     try {
-      console.log(signinDTO.password);
       return this.authService.signIn(signinDTO);
     } catch (error) {
-      console.log(error);
       return false;
     }
-   
   }
 
   @Public()
@@ -33,16 +31,13 @@ export class AuthController {
 
   @Public()
   @Post('autoLogin')
-  @ApiHeader({
-    name: 'session',
+  @ApiBody({
+    type: SessionDto
   })
-  @ApiHeader({
-    name: 'id',
-  })
-  async autoLogin(@Body() req) {
-
-    const id = await this.authService.autoLogin(req);
-    console.log(id);
-    return id;
+  async autoLogin(@Body() body) {
+    const session = await this.authService.autoLogin(body);
+    if (session) {
+      return { "session": session };
+    }
   }
 }

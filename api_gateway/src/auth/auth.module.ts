@@ -21,5 +21,6 @@ import { AUTH_SERVICE, MEDIA_SERVICE } from "../../../common/services.name";
   ],
   controllers: [AuthController],
   providers: [AuthGatewayService],
+  exports: [AuthGatewayService]
 })
 export class AuthModule {}

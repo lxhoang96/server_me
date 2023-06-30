@@ -6,7 +6,6 @@ import { CreateUserInterface } from '../../../../common/interfaces/create-user.i
 const {
   generateKeyPairSync,
     publicEncrypt,
-  privateDecrypt,
 } = require('crypto');
 @Injectable()
 export class UsersService {
@@ -91,9 +90,7 @@ export class UsersService {
     return encrypted.toString("base64");
   }
 
-  async decryptPrivate(key: string, newSession: string): Promise<any> {
-    return await publicEncrypt(key, Buffer.from(newSession));
-  }
+
 
   genKeys(password: string){
     const {

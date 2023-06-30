@@ -1,9 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { map, timeout } from 'rxjs/operators';
+import { catchError, map, timeout } from 'rxjs/operators';
 import { SigninDTO } from 'src/dto/signin.dto';
 import { CreateUserDto } from 'src/dto/create-user.dto';
 import { AUTH_SERVICE } from '../../../common/services.name';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class AuthGatewayService {
@@ -17,12 +18,11 @@ export class AuthGatewayService {
     const result = this.authService
       .send<any>(pattern, signinDTO)
       .pipe(timeout(3000));
-    // result.forEach(value => console.log(value));
     return result;
   }
 
   register(createUserDTO: CreateUserDto) {
-    const pattern = { cmd: "register" }; 
+    const pattern = { cmd: "register" };
     return this.authService
       .send<string>(pattern, createUserDTO)
       .pipe(
@@ -30,21 +30,27 @@ export class AuthGatewayService {
       );
   }
 
-  autoLogin(req: any) {
+  async autoLogin(req: any) {
     const pattern = { cmd: "autoLogin" };
-    return this.authService
+    return await firstValueFrom(this.authService
       .send<string>(pattern, req)
       .pipe(
-        map((message: any) => (message))
-      );
+        timeout(5000),
+        catchError(err => {
+          throw new HttpException(err.message, HttpStatus.UNAUTHORIZED);
+        }),));
   }
 
-  validateUser(token: string) {
-    const pattern = { cmd: "validateUser" };
-    return this.authService
-      .send<string>(pattern, token)
+  async validateUser(token: string, body: any) {
+    const pattern = { cmd: "validateToken" };
+    const result = await firstValueFrom(this.authService
+      .send<{ id: string, body: any }>(pattern, { token, body })
       .pipe(
-        map((message: any) => (message))
-      );
+        timeout(5000),
+        catchError(err => {
+          throw new HttpException(err.message, HttpStatus.UNAUTHORIZED);
+
+        }),));
+    return result;
   }
 }

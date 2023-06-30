@@ -18,9 +18,7 @@ export class UsersController {
   // })
   @MessagePattern({ cmd: 'me' })
   async getProfile(req) {
-    console.log(req.session);
     const session = await this.sessionService.findByValue(req.session);
-    console.log(session);
     return await this.userService.getProfile(session.userID.toString());
   }
 }
