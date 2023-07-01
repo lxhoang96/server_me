@@ -5,8 +5,11 @@ import { User } from './schemas/users.schema';
 import { CreateUserInterface } from '../../../../common/interfaces/create-user.interface';
 const {
   generateKeyPairSync,
-    publicEncrypt,
+  publicEncrypt,
 } = require('crypto');
+
+const bcrypt = require('bcrypt');
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -14,12 +17,14 @@ export class UsersService {
     private users: Model<User>,) { }
 
   async create(newUser: CreateUserInterface): Promise<User | undefined> {
-    if(this.validate(newUser)){
+    if (this.validate(newUser)) {
+      const salt = await bcrypt.genSalt(10);
+      newUser.password = await bcrypt.hash(newUser.password, salt);
       const createdUser = new this.users(newUser);
       const keys = this.genKeys(createdUser.id);
       createdUser.privateKey = keys.privateKey;
       createdUser.publicKey = keys.publicKey;
-    return await createdUser.save();
+      return await createdUser.save();
     }
   }
 
@@ -35,12 +40,12 @@ export class UsersService {
     switch (newType) {
       case 'discordId':
         return this.users.findOne({ discordId: newId }).exec();
-        
-        case 'telegramId':
+
+      case 'telegramId':
         return this.users.findOne({ telegramId: newId }).exec();
-          case 'email':
+      case 'email':
         return this.users.findOne({ email: newId }).exec();
-        case 'phoneNumber':
+      case 'phoneNumber':
         return this.users.findOne({ phoneNumber: newId }).exec();
       default:
         return null;
@@ -50,28 +55,28 @@ export class UsersService {
   async find(newUser: CreateUserInterface): Promise<Array<User>> {
     const params = [];
     if (newUser.discordId) {
-      params.push({discordId: newUser.discordId });
-        }
-        if(newUser.telegramId){
-          params.push({ telegramId: newUser.telegramId });
+      params.push({ discordId: newUser.discordId });
+    }
+    if (newUser.telegramId) {
+      params.push({ telegramId: newUser.telegramId });
 
-        }
-        if(newUser.email){
-          params.push({ email: newUser.email });
+    }
+    if (newUser.email) {
+      params.push({ email: newUser.email });
 
-        }
-        if(newUser.phoneNumber){
-          params.push({ phoneNumber: newUser.phoneNumber });
+    }
+    if (newUser.phoneNumber) {
+      params.push({ phoneNumber: newUser.phoneNumber });
 
-        }
-    return  await this.users.find().or(params).exec();
+    }
+    return await this.users.find().or(params).exec();
   }
 
 
   validate(user: CreateUserInterface) {
-    if( user.discordId || user.telegramId || user.email || user.phoneNumber)  // for async validations you must return a Promise<boolean> here
+    if (user.discordId || user.telegramId || user.email || user.phoneNumber)  // for async validations you must return a Promise<boolean> here
     {
-        return user;
+      return user;
     }
     return null;
   }
@@ -92,7 +97,7 @@ export class UsersService {
 
 
 
-  genKeys(password: string){
+  genKeys(password: string) {
     const {
       publicKey,
       privateKey,
@@ -109,9 +114,9 @@ export class UsersService {
         passphrase: password,
       },
     });
-  return {
-    publicKey,
-    privateKey,
-  };
-}
+    return {
+      publicKey,
+      privateKey,
+    };
+  }
 }

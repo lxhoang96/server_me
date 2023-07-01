@@ -11,7 +11,6 @@ export class UploaderController {
 
   @MessagePattern({ cmd: 'createUploader' })
   create(req: any) {
-    console.log(req)
     return this.uploaderService.create(req.userID);
   }
 

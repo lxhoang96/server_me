@@ -41,10 +41,13 @@ export class AuthGatewayService {
         }),));
   }
 
-  async validateUser(token: string, body: any) {
+  async validateUser(token: string
+    // , body: any
+  ) {
     const pattern = { cmd: "validateToken" };
     const result = await firstValueFrom(this.authService
-      .send<{ id: string, body: any }>(pattern, { token, body })
+      // .send<{ id: string, body: any }>(pattern, { token, body })
+      .send<{ id: string }>(pattern, { token })
       .pipe(
         timeout(5000),
         catchError(err => {

@@ -13,11 +13,9 @@ export class MediaService {
     private uploaderService: UploaderService,
   ) { }
   async create(createMediaInterface: CreateMediaInterface, paths: string[]) {
-    console.log(createMediaInterface.uploader)
     try {
       let docs = new this.mediaDocument(createMediaInterface);
       docs.paths = paths;
-    
       const savedDoc = await docs.save();
       let uploader = await this.uploaderService.findOne(createMediaInterface.uploader);
       uploader.medias.push(savedDoc._id);

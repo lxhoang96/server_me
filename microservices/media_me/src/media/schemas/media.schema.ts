@@ -25,6 +25,9 @@ export class MediaDocument extends Document {
   @Prop({ default: MediaType.Image })
   type: string;
 
+  @Prop()
+  name: string;
+
   @Prop({ required: true })
   paths: string[];
 

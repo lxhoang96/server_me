@@ -7,5 +7,6 @@ export class CreateMediaInterface {
 
   type: string;
 
-
 }
+
+

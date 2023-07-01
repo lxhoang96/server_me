@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGatewayService } from './auth.service';
-import { firstValueFrom, map } from 'rxjs';
 export const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 
@@ -33,12 +32,10 @@ export class AuthGuard implements CanActivate {
     if (!sessionValue) {
       throw new UnauthorizedException();
     }
-
     try {
-      const result = await this.authService.validateUser(sessionValue, request.body);
+      const result = await this.authService.validateUser(sessionValue);
       if (result) {
         request.headers['id'] = result.id;
-        request.body = result.body;
       } else {
         throw new UnauthorizedException();
       }

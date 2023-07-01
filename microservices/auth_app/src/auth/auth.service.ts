@@ -12,6 +12,9 @@ import { RpcException } from '@nestjs/microservices';
 const {
   privateDecrypt,
 } = require('crypto');
+
+const bcrypt = require('bcrypt');
+
 @Injectable()
 export class AuthService {
 
@@ -27,10 +30,11 @@ export class AuthService {
       throw new RpcException('Invalid credentials.');
 
     }
-    if (user.password !== signinDTO.password) {
-      throw new RpcException('Invalid credentials.');
-
+    const result = await bcrypt.compare(signinDTO.password, user.password);
+    if (!result) {
+      throw new RpcException('Invalid password.');
     }
+
     await this.sessionService.endAllUserSession(user.id);
     signinDTO.sessionDTO.userID = user.id;
     let newSession = await this.sessionService.createSession(signinDTO.sessionDTO);
@@ -84,7 +88,6 @@ export class AuthService {
     const user = await this.usersService.findOneById(session.userID.toHexString());
     if (!user) {
       throw new RpcException('Invalid credentials.');
-
     }
 
     // if (!session.userID.equals(user._id)) {
@@ -102,7 +105,7 @@ export class AuthService {
   }
 
   isSubObject(object1, object2) {
-    for (var key in object2) {
+    for (const key in object2) {
       // stop if the key exists in the subobject but not in the main object
       if (object2.hasOwnProperty(key) && !object1.hasOwnProperty(key)) {
         return false;
@@ -114,21 +117,28 @@ export class AuthService {
     return true;
   }
 
-  async validateToken(token: string, body: any): Promise<{id: string, body: any}> {
+  async validateToken(token: string
+    // , body: any
+  ): Promise<{
+    id: string
+    // , body: any
+  }> {
     const session = await this.sessionService.findByValue(token);
 
     if (!session || session.isExpired) {
-      throw new RpcException('Invalid credentials.');
+      throw new RpcException('Invalid session.');
 
     }
     const user = await this.usersService.findOneById(session.userID.toHexString());
     if (!user) {
-      throw new RpcException('Invalid credentials.');
-
+      throw new RpcException('Invalid user.');
     }
-    const bodyDecrypted = await this.decryptPrivate(user.privateKey, body);
-    
-    return { id: user._id, body: bodyDecrypted };
+    // const bodyDecrypted = await this.decryptPrivate(user.privateKey, body);
+
+    return {
+      id: user._id
+      // , body: bodyDecrypted
+    };
   }
 
   async decryptPrivate(key: string, value: string): Promise<any> {

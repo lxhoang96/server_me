@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { AppService } from "./app.service";
-import { AUTH_SERVICE, MEDIA_SERVICE } from "../../common/services.name";
+import { AUTH_SERVICE } from "../../common/services.name";
 import { AuthModule } from './auth/auth.module';
 import { MediaModule } from './media/media.module';
 import { APP_GUARD } from "@nestjs/core";

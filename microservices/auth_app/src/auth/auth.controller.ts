@@ -31,7 +31,8 @@ export class AuthController {
 
   @MessagePattern({ cmd: 'validateToken' })
   async validateToken(req: any) {
-    const result = await this.authService.validateToken(req.token, req.body);
+    // const result = await this.authService.validateToken(req.token, req.body);
+    const result = await this.authService.validateToken(req.token);
     return result;
   }
 

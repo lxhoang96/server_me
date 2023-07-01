@@ -1,11 +1,5 @@
 import {
   IsNotEmpty,
-  IsEmail,
-  Validate,
-  IsString,
-  IsBoolean,
-  IsOptional,
-  IsArray,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { PlatformMedia } from 'src/media/enums/platform.enum';
